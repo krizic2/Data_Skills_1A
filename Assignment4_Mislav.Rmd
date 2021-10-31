@@ -1,0 +1,57 @@
+---
+title: "Assignment004"
+author: "Mislav"
+date: "10/31/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(pacman)
+pacman::p_load(tidyverse,dplyr,utils)
+```
+
+## Assignment 4
+
+Sex count
+
+
+```{r}
+myhome <- c('C:/Users/USER/Desktop/STATS')
+setwd(myhome) # set working directory
+setwd(paste0(myhome,'/',"level01-assignment004-krizic2"))
+data_path <- paste0(myhome,'/',"Data_Skills_1A")
+setwd(data_path)
+dat <- read.csv("ahi-cesd.csv")
+pinfo <- read_csv("participant-info.csv")
+all_dat <- inner_join(x = dat, # the first table you want to join
+                      y = pinfo, # the second table you want to join
+                      by = c("id", "intervention")) # columns the two tables have in common
+summarydata <- dplyr::select(.data = all_dat, # name of the object to take data from
+                      ahiTotal, cesdTotal, sex, age, educ, income, occasion,elapsed.days) # all the columns you want to keep
+
+summarydata$sex <- factor(summarydata$sex, labels = c('female','male'))
+```
+
+## Plot for sex count
+
+```{r echo=F}
+ggplot(summarydata, aes(x = as.factor(sex), fill = as.factor(sex))) +
+  geom_bar(show.legend = FALSE, alpha = .8) +
+  scale_x_discrete(name = "Sex") +
+  scale_fill_viridis_d(option = "E") +
+  scale_y_continuous(name = "Number of participants")+
+  theme_minimal()
+```
+
+## Plot for income
+```{r echo=FALSE}
+summarydata$income <- factor(summarydata$income,labels = c('below average','average','above average'))
+ggplot(summarydata, aes(x = as.factor(income), y = ahiTotal, fill = as.factor(income))) +
+  geom_violin(trim = FALSE, show.legend = FALSE, alpha = .4) +
+  geom_boxplot(width = .2, show.legend = FALSE, alpha = .7)+
+  scale_x_discrete(name = "Income", labels = c("Below Average", "Average", "Above Average")) +
+  scale_y_continuous(name = "Authentic Happiness Inventory Score")+
+  theme_minimal() +
+  scale_fill_viridis_d()
+```
